@@ -14,6 +14,19 @@ TagManager:
   - Enemy
   - Walls
   - LongSword
+  - TreasureBox_OB
+  - fireball
+  - Recover_Lintel
+  - Random_Box
+  - chest_open
+  - Recovery_OB
+  - Up_MaxHP
+  - Up_Damage
+  - Landform
+  - DMeffect
+  - HPeffect
+  - AKT_effect
+  - MAXHP_effect
   layers:
   - Default
   - TransparentFX

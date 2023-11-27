@@ -20,6 +20,8 @@ public class DoorName
 
 public class Start_game : MonoBehaviour
 {
+    public Doors Doors;
+
     DoorName[] StratRoom = new DoorName[]
     {
         new DoorName("Main Room", "Floor", 0f)
@@ -32,11 +34,11 @@ public class Start_game : MonoBehaviour
     // DoorName 클래스를 사용하여 각 문의 이름과 확률 저장
     DoorName[] doorOptions = new DoorName[]
     {
-            new DoorName("Recovery Room", "Recovery_Floor", 0.3f),
-            new DoorName("Trap Room", "Trap_Floor", 0.3f),
+            new DoorName("Recovery", "Recovery_Floor", 0.3f),
+            new DoorName("Trap", "Trap_Floor", 0.3f),
             new DoorName("Lintel", "Lintel_Floor", 0.3f),
-            new DoorName("Treasure room", "Treasure_Floor", 0.3f),
-            new DoorName("Regular Room", "Regular_Floor", 0.3f)
+            new DoorName("Treasure", "Treasure_Floor", 0.3f),
+            new DoorName("Regular", "Regular_Floor", 0.3f)
     };
 
     // Start is called before the first frame update
@@ -49,6 +51,11 @@ public class Start_game : MonoBehaviour
         selectedDoors = SelectTopTwoDoors(doorOptions);
 
         CreatDoor(selectedDoors);
+
+        // 모든 GameObject 비활성화
+        Doors.regularPrefab.SetActive(false);
+        Doors.randLPrefab.SetActive(false);
+        Doors.randomBoxPrefab.SetActive(false);
 
     }
 

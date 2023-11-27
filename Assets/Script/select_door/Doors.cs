@@ -11,7 +11,13 @@ public class Doors : MonoBehaviour
     public DoorGenerator doorGenerator;
     public Start_game SG;
     public GameObject OVRPlayerController;
-    public LandformSpawner LS;
+    
+    public GameObject regularPrefab;
+    public GameObject randLPrefab;
+    public GameObject randomBoxPrefab;
+    public GameObject recoveryPrefab;
+    public GameObject UpstateHPPrefab;
+    public GameObject UpstateDMPrefab;
     public EnemySpawner ES;
 
     public void ChangeDoorLocation(DoorName[] selectedDoors, int i)
@@ -19,6 +25,7 @@ public class Doors : MonoBehaviour
         string selectedtag = SG.AllDoors[i].Tag;
         float planeHeight = 0f;  // Plane의 높이를 저장하는 변수, 초기화는 0으로 가정
         float planeX = 0f;
+        float planeY = 0f;
 
         GameObject floorPlane = GameObject.FindGameObjectWithTag(selectedtag);
         if (floorPlane != null)
@@ -28,14 +35,15 @@ public class Doors : MonoBehaviour
             {
                 planeHeight = planeRenderer.bounds.max.z;
                 planeX = planeRenderer.bounds.center.x;
+                planeY = planeRenderer.bounds.center.y;
             }
         }
 
         selectedDoors = SG.SelectTopTwoDoors(SG.AllDoors);
 
         // 선택된 문에 대한 DoorInfo 생성
-        DoorInfo leftDoorInfo = new DoorInfo(selectedDoors[0].Name, selectedDoors[0].Tag, new UnityEngine.Vector3(planeX - 2f, 1.5f, planeHeight));
-        DoorInfo rightDoorInfo = new DoorInfo(selectedDoors[1].Name, selectedDoors[1].Tag, new UnityEngine.Vector3(planeX + 2f, 1.5f, planeHeight));
+        DoorInfo leftDoorInfo = new DoorInfo(selectedDoors[0].Name, selectedDoors[0].Tag, new UnityEngine.Vector3(planeX - 2f, planeY + 1.5f, planeHeight));
+        DoorInfo rightDoorInfo = new DoorInfo(selectedDoors[1].Name, selectedDoors[1].Tag, new UnityEngine.Vector3(planeX + 2f, planeY + 1.5f, planeHeight));
 
         // 각 문에 대한 DoorGenerator 호출
         doorGenerator.GenerateDoor(leftDoorInfo);
@@ -48,17 +56,65 @@ public class Doors : MonoBehaviour
     public void MovePlayer(int i)
     {
         string selectedtag = SG.AllDoors[i].Tag;
-        if (selectedtag == "Regular_Floor")
+
+        // 모든 GameObject 비활성화
+        regularPrefab.SetActive(false);
+        randLPrefab.SetActive(false);
+        randomBoxPrefab.SetActive(false);
+        recoveryPrefab.SetActive(false);
+        UpstateHPPrefab.SetActive(false);
+        UpstateDMPrefab.SetActive(false);
+
+        PlayerController PC = FindObjectOfType<PlayerController>();
+        
+        // Collider 비활성화
+        Collider treasureBoxCollider = null;
+
+        switch (selectedtag)
         {
-            LS.DestroyLandforms();
-            LS.SpawnLandforms();
-            ES.DestroyEnemys();
-            ES.SpawnEnemies();
+            case "Regular_Floor":
+                regularPrefab.SetActive(true);
+                ES.SpawnEnemies();
+                break;
+            case "Recovery_Floor":
+                randLPrefab.SetActive(true);
+                recoveryPrefab.SetActive(true);
+                break;
+            case "Lintel_Floor":
+                randLPrefab.SetActive(true);
+                UpstateHPPrefab.SetActive(true);
+                UpstateDMPrefab.SetActive(true);
+                PC.HPupEffect.Stop();
+                PC.DMupEffect.Stop();
+                break;
+            case "Treasure_Floor":
+            case "Trap_Floor":
+                randomBoxPrefab.SetActive(true);
+                PC.debuff_boxEF.Stop();
+                PC.open_boxEF.Stop();
+                PC.buff_boxEF.Stop();
+                GameObject treasureBox = GameObject.FindWithTag("TreasureBox_OB");
+                if (treasureBox != null)
+                {
+                    treasureBoxCollider = treasureBox.GetComponent<Collider>();
+                    if (treasureBoxCollider != null)
+                    {
+                        treasureBoxCollider.enabled = true;
+                    }
+                }
+                break;
         }
-        else { LS.DestroyLandforms(); ES.DestroyEnemys(); }
-            
+
+        // 필요한 경우 Collider 활성화
+        if (treasureBoxCollider != null)
+        {
+            treasureBoxCollider.enabled = true;
+        }
+
+
         float planeHeight = 0f;  // Plane의 높이를 저장하는 변수, 초기화는 0으로 가정
         float planeX = 0f;
+        float planeY = 0f;
         GameObject floorPlane = GameObject.FindGameObjectWithTag(selectedtag);
         if (floorPlane != null)
         {
@@ -67,11 +123,11 @@ public class Doors : MonoBehaviour
             {
                 planeHeight = planeRenderer.bounds.min.z + 5f;
                 planeX = planeRenderer.bounds.center.x;
+                planeY = planeRenderer.bounds.center.y;
             }
         }
         DisableCharacterController();
-        // Set the player's position to the clicked door's position with X and Z set to zero
-        OVRPlayerController.transform.localPosition = new UnityEngine.Vector3(planeX, 2f, planeHeight);
+        OVRPlayerController.transform.localPosition = new UnityEngine.Vector3(planeX, planeY, planeHeight);
         EnableCharacterController();
 
     }
