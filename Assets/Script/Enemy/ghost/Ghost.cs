@@ -19,6 +19,8 @@ public class Ghost : MonoBehaviour
     public float distanceToPlayer;
     private float attackRange = 12f;
 
+    public GameObject UserSoundManager;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -32,6 +34,8 @@ public class Ghost : MonoBehaviour
         playerstatusUI = GameObject.Find("playerstatusUI").GetComponent<PlayerStatusUI>();
 
         //StartCoroutine(AttackCoroutine());
+
+        UserSoundManager = GameObject.Find("OVRPlayerController");
     }
 
     // Update is called once per frame
@@ -100,6 +104,7 @@ public class Ghost : MonoBehaviour
             // 오른손 컨트롤러에 진동 적용
             StartCoroutine(Haptics(1, 1, 0.03f, true, true));
 
+            UserSoundManager.GetComponent<UserSoundManager>().PlayAtkSound();
         }
     }
 

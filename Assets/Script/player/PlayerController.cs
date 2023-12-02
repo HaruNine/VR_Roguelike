@@ -20,21 +20,27 @@ public class PlayerController : MonoBehaviour
     public ParticleSystem buff_boxEF;
 
     public GameObject playerstatusUI;
+    public GameObject UserSoundManager;
     private bool isUIActive = false;
+    private Vector3 previousPosition;
 
-    
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         HealEffect.Stop();
-        
+
+        UserSoundManager = GameObject.Find("OVRPlayerController");
+        previousPosition = transform.position;
     }
 
     void Update()
     {
+        Vector3 currentPosition = transform.position;
         // 오른손 그랩 버튼을 누르는지 확인
         bool isGrabbing = OVRInput.Get(OVRInput.Button.SecondaryHandTrigger);
+        bool isRun = OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger);
 
         if (isGrabbing)
         {
@@ -48,6 +54,20 @@ public class PlayerController : MonoBehaviour
             longSword.SetVisibilityAndCollider(false);
         }
 
+        if (Mathf.Abs(currentPosition.x - previousPosition.x) >= 3.5f || Mathf.Abs(currentPosition.z - previousPosition.z) >= 3.5f)
+        {
+            if (isRun)
+            {
+                UserSoundManager.GetComponent<UserSoundManager>().Move = 2;
+            }
+            else
+            {
+                UserSoundManager.GetComponent<UserSoundManager>().Move = 1;
+            }
+            UserSoundManager.GetComponent<UserSoundManager>().PlayMoveSound();
+            // 현재 위치를 이전 위치로 업데이트
+            previousPosition = currentPosition;
+        }
 
         // 오른쪽 컨트롤러 검지 트리거 클릭 감지
         if (OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger))
@@ -63,6 +83,8 @@ public class PlayerController : MonoBehaviour
                 {
                     // 클릭한 문의 이름
                     string clickedDoorName = hit.collider.gameObject.name;
+
+                    UserSoundManager.GetComponent<UserSoundManager>().PlayDoorSound();
 
                     // 이름에 따라 동작 구분
                     if (clickedDoorName == SG.AllDoors[0].Name)
@@ -93,10 +115,11 @@ public class PlayerController : MonoBehaviour
                     if (playerStatus != null)
                     {
                         HPupEffect.Play();
-                        if(playerStatus.playerSoul >= playerStatus.paySoulHP)
+                        if (playerStatus.playerSoul >= playerStatus.paySoulHP)
                         {
                             playerStatus.UP_MaxHP();
                         }
+                        else { UserSoundManager.GetComponent<UserSoundManager>().PlayNerfSound(); }
                     }
                 }
                 if (hit.collider.CompareTag("Up_Damage"))
@@ -110,6 +133,7 @@ public class PlayerController : MonoBehaviour
                         {
                             playerStatus.UP_playerDamage();
                         }
+                        else { UserSoundManager.GetComponent<UserSoundManager>().PlayNerfSound(); }
                     }
                 }
                 if (hit.collider.CompareTag("TreasureBox_OB"))

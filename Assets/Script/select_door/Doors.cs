@@ -66,9 +66,19 @@ public class Doors : MonoBehaviour
         UpstateDMPrefab.SetActive(false);
 
         PlayerController PC = FindObjectOfType<PlayerController>();
+        PlayerStatus PS = FindAnyObjectByType<PlayerStatus>();
         
         // Collider 비활성화
         Collider treasureBoxCollider = null;
+
+        if (selectedtag == "Treasure_Floor")
+        {
+            PS.checkBox = true;
+        }
+        if (selectedtag == "Trap_Floor")
+        {
+            PS.checkBox = false;
+        }
 
         switch (selectedtag)
         {

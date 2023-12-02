@@ -20,6 +20,9 @@ public class Enemy : MonoBehaviour
     private float attackRange = 1.7f;
     private float forwardTo = 1.35f;
 
+    public GameObject UserSoundManager;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -33,6 +36,8 @@ public class Enemy : MonoBehaviour
         playerstatusUI = GameObject.Find("playerstatusUI").GetComponent<PlayerStatusUI>();
 
         //StartCoroutine(AttackCoroutine());
+
+        UserSoundManager = GameObject.Find("OVRPlayerController");
     }
 
     // Update is called once per frame
@@ -101,6 +106,7 @@ public class Enemy : MonoBehaviour
             // 오른손 컨트롤러에 진동 적용
             StartCoroutine(Haptics(1, 1, 0.03f, true, true));
 
+            UserSoundManager.GetComponent<UserSoundManager>().PlayAtkSound();
         }
     }
 

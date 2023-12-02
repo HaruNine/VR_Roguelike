@@ -20,6 +20,8 @@ public class Flying_Skull : MonoBehaviour
     private float attackRange = 2f;
     private float forwardTo = 1.35f;
 
+    public GameObject UserSoundManager;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -33,6 +35,8 @@ public class Flying_Skull : MonoBehaviour
         playerstatusUI = GameObject.Find("playerstatusUI").GetComponent<PlayerStatusUI>();
 
         //StartCoroutine(AttackCoroutine());
+
+        UserSoundManager = GameObject.Find("OVRPlayerController");
     }
 
     // Update is called once per frame
@@ -101,6 +105,7 @@ public class Flying_Skull : MonoBehaviour
             // 오른손 컨트롤러에 진동 적용
             StartCoroutine(Haptics(1, 1, 0.03f, true, true));
 
+            UserSoundManager.GetComponent<UserSoundManager>().PlayAtkSound();
         }
     }
 

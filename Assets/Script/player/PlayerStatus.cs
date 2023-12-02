@@ -20,6 +20,10 @@ public class PlayerStatus : MonoBehaviour
     public int Kill_Count {  get; private set; }
     public int HPLv {  get; private set; }
     public int ATKLv {  get; private set; }
+    public bool checkBox;
+    public int randomBox;
+
+    public GameObject UserSoundManager;
 
     private void Awake()
     {
@@ -27,12 +31,16 @@ public class PlayerStatus : MonoBehaviour
         //playerFloor = 40;
         //playerHP = 50;
         //playerSoul = 1000;
+
+        UserSoundManager = GameObject.Find("OVRPlayerController");
     }
 
     // 플레이어가 피해를 입음
     public void TakeDamage(int damage)
     {
         playerHP -= damage;
+
+        UserSoundManager.GetComponent<UserSoundManager>().PlayHurtSound();
 
         // 피가 음수가 되지 않도록 보호
         playerHP = Mathf.Max(playerHP, 0);
@@ -45,6 +53,12 @@ public class PlayerStatus : MonoBehaviour
 
     // 플레이어가 사망
     void Die()
+    {
+        UserSoundManager.GetComponent<UserSoundManager>().PlayDeathSound();
+        Invoke("ReloadScene", 1f);
+    }
+
+    void ReloadScene()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
@@ -61,15 +75,18 @@ public class PlayerStatus : MonoBehaviour
         PC.buff_boxEF.Play();
         playerSoul += (soul+(playerFloor/10*10));
         Count_Box++;
+        UserSoundManager.GetComponent<UserSoundManager>().PlayBuffSound();
     }
 
     public void RecoveryHP()
     {
+        UserSoundManager.GetComponent<UserSoundManager>().PlayBuffSound();
         playerHP = playerMaxHP;
     }
 
     public void UP_MaxHP()
     {
+        UserSoundManager.GetComponent<UserSoundManager>().PlayBuffSound();
         playerSoul -= paySoulHP;
         playerMaxHP += UpHP;
         playerHP += UpHP;
@@ -80,6 +97,7 @@ public class PlayerStatus : MonoBehaviour
 
     public void UP_playerDamage()
     {
+        UserSoundManager.GetComponent<UserSoundManager>().PlayBuffSound();
         playerSoul -= paySoulDM;
         playerDamage += UpDM;
         paySoulDM += 10;
@@ -95,6 +113,9 @@ public class PlayerStatus : MonoBehaviour
     public void downHP()
     {
         PlayerController PC = FindObjectOfType<PlayerController>();
+
+        UserSoundManager.GetComponent<UserSoundManager>().PlayNerfSound();
+
         PC.debuff_boxEF.Play();
         if (playerHP <= (20 + (playerFloor / 10 * 5)))
         {
@@ -106,6 +127,9 @@ public class PlayerStatus : MonoBehaviour
     public void downSoul()
     {
         PlayerController PC = FindObjectOfType<PlayerController>();
+
+        UserSoundManager.GetComponent<UserSoundManager>().PlayNerfSound();
+
         PC.debuff_boxEF.Play();
         if (playerSoul <= (10 + (playerFloor / 10 * 10)))
         {
@@ -117,20 +141,31 @@ public class PlayerStatus : MonoBehaviour
     public void upStats()
     {
         PlayerController PC = FindObjectOfType<PlayerController>();
+
+        UserSoundManager.GetComponent<UserSoundManager>().PlayBuffSound();
+
         PC.buff_boxEF.Play();
-        if (playerHP + (5 + (playerFloor / 10 * 10)) >= playerMaxHP)
+        if (playerHP + (5 + (playerFloor / 10 * 5)) >= playerMaxHP)
         {
             playerHP = playerMaxHP;
         }
-        else { playerHP += (5 + (playerFloor / 10 * 10)); }
-        playerSoul += (5 + (playerFloor / 10 * 10));
+        else { playerHP += (5 + (playerFloor / 10 * 5)); }
+        playerSoul += (5 + (playerFloor / 10 * 5));
     }
 
     public void RandomSelectChest()
     {
-        int random = Mathf.Clamp(Random.Range(-2, 4), 0, 3);
+        
+        if (checkBox == true)
+        {
+            randomBox = 0;
+        }
+        if (checkBox == false)
+        {
+            randomBox = Mathf.Clamp(Random.Range(1, 4), 1, 3);
+        }
 
-        switch (random)
+        switch (randomBox)
         {
             case 0:
                 TreasureBox(20);
