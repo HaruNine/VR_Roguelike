@@ -1,5 +1,5 @@
 # VR_Roguelike
-던전형식의 로그라이크 VR게임
+무한 던전형식의 로그라이크 VR게임
 </br></br></br></br>
 
 ## Room
